@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Studi Kasus Penjualan E-Commerce</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:grid;place-items:center;padding:20px;background:#f3f5f8;color:#172033;font-family:Arial,Helvetica,sans-serif}
+main{width:100%;max-width:770px;padding:34px 35px;background:#fff;border:1px solid #e0e5ed;border-radius:22px;box-shadow:0 16px 45px #17203312}
+h1{font-size:29px;line-height:1.25;margin:0 0 16px;font-weight:700}
+p{font-size:18px;line-height:1.55;color:#536174;margin:0 0 24px}
+button{width:100%;padding:16px 18px;border:0;border-radius:12px;background:#4267ce;color:#fff;font-size:19px;font-weight:700;cursor:pointer}
+button:hover{background:#3458bb}
+@media(max-width:520px){main{padding:25px 22px}h1{font-size:24px}p{font-size:16px}button{font-size:17px}}
+</style>
+</head>
+<body>
+<main>
+  <h1>Studi Kasus: Penjualan E-Commerce</h1>
+  <p>Analisis dan perbaiki dataset transaksi penjualan melalui proses Data Cleaning dan Feature Engineering.</p>
+  <button id="download">Unduh Dataset CSV</button>
+</main>
+<script>
+(() => {
+  const pilih = a => a[Math.floor(Math.random()*a.length)];
+  const indeks = (n,k) => {
+    const a=Array.from({length:n},(_,i)=>i);
+    for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+    return a.slice(0,k);
+  };
+  const tanggal = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  const kolom=['ID_Transaksi','ID_Pelanggan','Tanggal_Pemesanan','Kategori_Produk','Jumlah_Produk','Harga_Satuan','Diskon','Metode_Pembayaran','Usia_Pelanggan','Kota','Tanggal_Pengiriman','Penilaian_Pelanggan'];
+  function buatData(){
+    const jumlah=125+Math.floor(Math.random()*36);
+    const kategori=['Elektronik','Busana','Makanan','Rumah dan Hunian','Kecantikan'];
+    const pembayaran=['Tunai','Kartu Kredit','Dompet Digital','Transfer Bank'];
+    const kota=['Jakarta','Tangerang','Depok','Bogor','Bekasi'];
+    const harga=[25000,45000,75000,120000,250000,500000];
+    const data=[];
+    for(let i=0;i<jumlah;i++){
+      const pesan=new Date(2025,0,1+Math.floor(Math.random()*300));
+      const kirim=new Date(pesan);kirim.setDate(kirim.getDate()+1+Math.floor(Math.random()*8));
+      data.push({
+        ID_Transaksi:`TRX${String(i+1).padStart(4,'0')}`,
+        ID_Pelanggan:`PLG${String(1+Math.floor(Math.random()*55)).padStart(3,'0')}`,
+        Tanggal_Pemesanan:tanggal(pesan),Kategori_Produk:pilih(kategori),
+        Jumlah_Produk:1+Math.floor(Math.random()*5),Harga_Satuan:pilih(harga),
+        Diskon:pilih([0,0.05,0.10,0.15,0.20]),Metode_Pembayaran:pilih(pembayaran),
+        Usia_Pelanggan:18+Math.floor(Math.random()*48),Kota:pilih(kota),
+        Tanggal_Pengiriman:tanggal(kirim),Penilaian_Pelanggan:1+Math.floor(Math.random()*5)
+      });
+    }
+    const ubah=(kolom,nilai)=>{const ix=indeks(data.length,nilai.length);ix.forEach((i,j)=>data[i][kolom]=nilai[j]);};
+    ubah('Usia_Pelanggan',[null,null,null,null]);
+    ubah('Metode_Pembayaran',[null,null,null]);
+    ubah('Penilaian_Pelanggan',[null,null,null,null]);
+    ubah('Tanggal_Pengiriman',[null,null,null]);
+    ubah('Kota',[null,null]);
+    ubah('Kategori_Produk',['elektronik','BUSANA ',' rumah dan hunian']);
+    ubah('Kota',['jakarta','TANGERANG ','depok']);
+    ubah('Metode_Pembayaran',['dompet digital','KARTU KREDIT']);
+    ubah('Tanggal_Pemesanan',['15/02/2025','tanggal tidak valid']);
+    ubah('Tanggal_Pengiriman',['31-02-2025','tanggal tidak valid']);
+    ubah('Jumlah_Produk',['dua','banyak']);
+    ubah('Harga_Satuan',['75000']);
+    ubah('Diskon',['10%']);
+    ubah('Usia_Pelanggan',['empat puluh']);
+    ubah('Jumlah_Produk',[0,-2]);
+    ubah('Harga_Satuan',[-50000]);
+    ubah('Diskon',[1.5]);
+    ubah('Usia_Pelanggan',[-5,150]);
+    ubah('Penilaian_Pelanggan',[8]);
+    ubah('Jumlah_Produk',[150,200]);
+    ubah('Harga_Satuan',[25000000,30000000]);
+    const ix=indeks(data.length,1)[0];
+    const d=new Date(data[ix].Tanggal_Pemesanan+'T00:00:00');
+    d.setDate(d.getDate()-3);data[ix].Tanggal_Pengiriman=tanggal(d);
+    indeks(data.length,3).forEach(i=>data.push({...data[i]}));
+    for(let i=data.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[data[i],data[j]]=[data[j],data[i]];}
+    return data;
+  }
+  const kutip=v=>{if(v===null||v===undefined)return '';const s=String(v);return /[",\r\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;};
+  document.getElementById('download').addEventListener('click',()=>{
+    const data=buatData();
+    const isi=[kolom.join(','),...data.map(row=>kolom.map(c=>kutip(row[c])).join(','))].join('\r\n');
+    const blob=new Blob(['\ufeff'+isi],{type:'text/csv;charset=utf-8;'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;
+    a.download='Dataset_Penjualan_E-Commerce.csv';
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),2000);
+  });
+})();
+</script>
+</body>
+</html>
